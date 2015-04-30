@@ -12,18 +12,20 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.healthkart.vo.Order;
+
 /**
  * @author Rajan
  *
  */
-@Path("/healthkart")
+@Path("/orders")
 public class HealthkartOrderService {
 
-	@Path("/createUser")
+	@Path("/createOrder")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createOrder( InputStream is )
+	public Order createOrder( InputStream is )
 	{
 		return null;
 	}
