@@ -1,7 +1,7 @@
 /**
  * 
  */
-package healthkart;
+package com.healthkart.service;
 
 import java.io.InputStream;
 
