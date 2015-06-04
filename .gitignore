@@ -2,5 +2,8 @@
 /.settings/
 .classpath
 target
+/target/m2e-wtp
+/target/maven-archiver
+*.war
 
 
