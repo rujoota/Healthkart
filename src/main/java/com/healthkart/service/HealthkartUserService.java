@@ -4,7 +4,9 @@
 package com.healthkart.service;
 
 import java.io.InputStream;
+import java.time.LocalDateTime;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -17,7 +19,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.google.gson.Gson;
 import com.healthkart.vo.User;
+import com.sun.org.apache.xerces.internal.util.Status;
 
 /**
  * @author Rajan
@@ -40,10 +44,18 @@ public class HealthkartUserService {
 	@GET
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public User retrieveUser( @HeaderParam("userId") String userId )
+	public Response retrieveUser( @HeaderParam("userId") String userId )
 	{
-		System.out.println("Inside retrieveUser");
-		return null;
+		User user = new User();
+		user.setUserID("1");
+		user.setUserName("rajan.jethva");
+		user.setPassword("password");
+		user.setRole("admin");
+		user.setCreatedDate(LocalDateTime.now());
+		user.setCreatedDate(LocalDateTime.now().minusHours((long) 24.00));
+		Gson gson = new Gson();
+		String jsonResponse = gson.toJson( user );
+		return Response.status(HttpServletResponse.SC_OK).entity(jsonResponse).build();
 	}
 	
 	@Path("/updateUser")
