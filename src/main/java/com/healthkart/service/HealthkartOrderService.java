@@ -21,6 +21,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 
 /**
  * @author Rajan
@@ -46,7 +48,51 @@ public class HealthkartOrderService {
         }
         return null;
     }
+@Path("/checkLocation")
+    @GET
+    public Response checkLocation(@HeaderParam("pincode") int pincode ) {
+        //return null;
+        try
+        {        
+        	if(isValidPincode(pincode))
+        		return Response.status(HttpServletResponse.SC_OK).build();
+        	else
+        		return Response.status(HttpServletResponse.SC_BAD_REQUEST).build();
+        }
+        catch(Exception ex)
+        {
+            System.out.println("exception in createorder :"+ex.toString());
+        }
+        return null;
+    }
 
+    Boolean isValidPincode(int pincode) {
+        String dbUrl = "jdbc:mysql://localhost/inviks";        
+        String query = "Select * FROM pincode_available where pincode="+pincode;
+        String userName = "root", password = "password";
+        
+        try {
+
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection con = DriverManager.getConnection(dbUrl, userName, password);
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            int count=0;
+            while (rs.next()) {
+                count++;
+            } 
+            con.close();
+            if(count==0)
+            	return false;
+            else
+            	return true;           
+            
+        } 
+        catch (Exception e) {
+            System.out.println("exception in getorder :"+e.toString());
+        } 
+        return false;
+    }
     ArrayList<Demo> getOrder() {
         String dbUrl = "jdbc:mysql://localhost/inviks";
         
