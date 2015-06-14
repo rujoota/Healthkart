@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -31,13 +32,7 @@ import javax.ws.rs.HeaderParam;
  */
 @Path("/orders")
 public class HealthkartOrderService
-{
-
-    String dbUrl = "jdbc:mysql://localhost/inviks";
-    String userName = "root", password = "password";
-    String forname = "com.mysql.jdbc.Driver";
-    Connection con;
-
+{  
     @Path("/createOrder")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -48,10 +43,29 @@ public class HealthkartOrderService
         try
         {
             Gson gson = new Gson();
-            return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(getOrder())).build();
+            return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(Helper.getOrder())).build();
         } catch (Exception ex)
         {
             System.out.println("exception in createorder :" + ex.toString());
+        }
+        return null;
+    }
+
+    @Path("/getMedicineDetails")
+    @GET
+    public Response getMedicineDetails(@HeaderParam("medicineId") String medicineId)
+    {
+        try
+        {
+            Gson gson = new Gson();
+            Medicines med1=Helper.getMedicineDetail(medicineId);
+            ArrayList<Medicines> list=new ArrayList<Medicines>();
+            list.add(med1);
+            
+            return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(Helper.getSubstitute(medicineId,list))).build();
+        } catch (Exception ex)
+        {
+            System.out.println("exception in getMedicineDetails :" + ex.toString());
         }
         return null;
     }
@@ -63,41 +77,13 @@ public class HealthkartOrderService
         try
         {
             Gson gson = new Gson();
-            return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(searchMedicine(searchQuery))).build();
+            
+            return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(Helper.searchMedicine(searchQuery))).build();
         } catch (Exception ex)
         {
             System.out.println("exception in getMedicine :" + ex.toString());
         }
         return null;
-    }
-
-    ArrayList<Medicines> searchMedicine(String searchString)
-    {
-        //connection.prepareStatement("SELECT * FROM table1 LIMIT ?,?");
-        String query = "Select * FROM medicines where medicine_name like '"+searchString+"%'";
-        ArrayList<Medicines> arr = new ArrayList<Medicines>();
-        try
-        {
-            Class.forName(forname);
-            con = DriverManager.getConnection(dbUrl, userName, password);
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
-            while (rs.next())
-            {
-                Medicines med=new Medicines();
-                med.setMedicineId(rs.getString("medicineid"));
-                med.setMedicineName(rs.getString("medicine_name"));
-                med.setShortDescription(rs.getString("short_description"));
-                med.setPrice(rs.getInt("price"));
-                arr.add(med);
-            }
-            System.out.println(arr);
-            con.close();
-        } catch (Exception e)
-        {
-            System.out.println("exception in searchMedicine :" + e.toString());
-        }
-        return arr;
     }
 
     @Path("/checkLocation")
@@ -107,7 +93,7 @@ public class HealthkartOrderService
         //return null;
         try
         {
-            if (isValidPincode(pincode))
+            if (Helper.isValidPincode(pincode))
             {
                 return Response.status(HttpServletResponse.SC_OK).build();
             } 
@@ -123,64 +109,7 @@ public class HealthkartOrderService
         return null;
     }
 
-    Boolean isValidPincode(int pincode)
-    {
-        String query = "Select * FROM pincode_available where pincode=" + pincode;
-        try
-        {
-            Class.forName(forname);
-            con = DriverManager.getConnection(dbUrl, userName, password);
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
-            int count = 0;
-            while (rs.next())
-            {
-                count++;
-            }
-            con.close();
-            if (count == 0)
-            {
-                return false;
-            } else
-            {
-                return true;
-            }
-
-        } catch (Exception e)
-        {
-            System.out.println("exception in getorder :" + e.toString());
-        }
-        return false;
-    }
-
-    ArrayList<Demo> getOrder()
-    {
-
-        String query = "Select * FROM demo";
-
-        ArrayList<Demo> arr = new ArrayList<Demo>();
-        try
-        {
-
-            Class.forName(forname);
-            Connection con = DriverManager.getConnection(dbUrl, userName, password);
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
-
-            while (rs.next())
-            {
-                arr.add(new Demo(rs.getString(1)));
-            }
-            System.out.println(arr);
-            con.close();
-        } catch (Exception e)
-        {
-            System.out.println("exception in getorder :" + e.toString());
-        }
-        return arr;
-    }
 }
-
 class Demo
 {
 
