@@ -5,15 +5,22 @@
  */
 package com.healthkart.service;
 
+import com.google.gson.Gson;
 import com.healthkart.Medicines;
+import com.healthkart.MedicinesInCart;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -54,7 +61,78 @@ public class Helper
         }
         return false;
     }
-
+    static String addToCart(String medicineId,int qty,String orderId,String userId)
+    {
+        String returnStatus;
+        
+        try
+        {
+            Class.forName(forname);
+            con = DriverManager.getConnection(dbUrl, userName, password);
+            CallableStatement cs = null;            
+            cs = con.prepareCall("{call createCartEntry(?,?,?,?,?)}");
+            cs.setString(1, medicineId);
+            cs.setInt(2, qty);
+            cs.setString(3, orderId);
+            cs.setString(4, userId);
+            cs.registerOutParameter(5, Types.VARCHAR);
+            ResultSet rs = cs.executeQuery();
+            returnStatus=cs.getString(5);
+            con.close();
+        } 
+        catch (Exception e)
+        {
+            System.out.println("exception in addToCart :" + e.toString());
+            returnStatus="exception : "+e.getMessage();
+        }
+        return returnStatus;
+    }
+    static ArrayList<Medicines> getMedicineDataForCart(String[] medicineIds)
+    {
+        ArrayList<Medicines> arr = new ArrayList<Medicines>();
+        String query="select medicineid,price,medicine_name,quantity_available FROM medicines where medicineid in('";
+        for(int i=0;i<medicineIds.length;i++)
+        {
+            if(i==medicineIds.length-1)
+                query += medicineIds[i]+"')";
+            else
+                query += medicineIds[i]+"','";   
+        }
+        
+        try
+        {
+            Class.forName(forname);
+            con = DriverManager.getConnection(dbUrl, userName, password);
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            
+            while (rs.next())
+            {
+                Medicines temp=new Medicines();
+                temp.setMedicineId(rs.getString("medicineid"));
+                temp.setPrice(rs.getDouble("price"));
+                temp.setMedicineName(rs.getString("medicine_name"));
+                temp.setQuantity(rs.getInt("quantity_available"));
+                arr.add(temp);
+            }
+        } 
+        catch (Exception e)
+        {
+            System.out.println("exception in getMedicineDataForCart :" + e.toString());
+        }
+        finally
+        {
+            try
+            {
+                con.close();
+            } 
+            catch (SQLException ex)
+            {
+                System.out.println("exception in getMedicineDataForCart :" + ex.toString());
+            }
+        }
+        return arr;
+    }
     static ArrayList<Demo> getOrder()
     {
 
@@ -198,6 +276,38 @@ public class Helper
             System.out.println("exception in getMedicineDetails :" + e.toString());
         }
         return med;
+    }
+    static ArrayList<MedicinesInCart> getItemsFromCart(String userId,String orderId)
+    {
+        ArrayList<MedicinesInCart> arrayList=new ArrayList<MedicinesInCart>();        
+        try
+        {
+            Class.forName(forname);
+            con = DriverManager.getConnection(dbUrl, userName, password);
+            CallableStatement cs = null;            
+            cs = con.prepareCall("{call getCartEntries(?,?)}");
+            cs.setString(1, userId);
+            cs.setString(2, orderId);
+            ResultSet rs = cs.executeQuery();
+            while (rs.next())
+            {
+                MedicinesInCart medicinesInCart=new MedicinesInCart();
+                medicinesInCart.setMedicineId(rs.getString("medicineid"));
+                medicinesInCart.setMedicineName(rs.getString("medicine_name"));
+                medicinesInCart.setQtyAvailable(rs.getInt("qty_available"));
+                medicinesInCart.setPrice(rs.getDouble("price"));
+                medicinesInCart.setQtyOrdered(rs.getInt("qty_ordered"));
+                medicinesInCart.setTotal(rs.getInt("total"));
+                medicinesInCart.setOrderId(rs.getString("orderid"));
+                arrayList.add(medicinesInCart);
+            }
+            con.close();
+        } 
+        catch (Exception e)
+        {
+            System.out.println("exception in addToCart :" + e.toString());            
+        }
+        return arrayList;
     }
     
 }

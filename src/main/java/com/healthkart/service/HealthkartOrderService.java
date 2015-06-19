@@ -51,6 +51,20 @@ public class HealthkartOrderService
         return null;
     }
 
+    @Path("/searchMedicine")
+    @GET
+    public Response searchMedicine(@HeaderParam("searchQuery") String searchQuery)
+    {
+        try
+        {
+            Gson gson = new Gson();           
+            return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(Helper.searchMedicine(searchQuery))).build();
+        } catch (Exception ex)
+        {
+            System.out.println("exception in searchMedicine :" + ex.toString());
+        }
+        return null;
+    }
     @Path("/getMedicineDetails")
     @GET
     public Response getMedicineDetails(@HeaderParam("medicineId") String medicineId)
@@ -69,19 +83,34 @@ public class HealthkartOrderService
         }
         return null;
     }
-
-    @Path("/getMedicine")
+    @Path("/getDataFromCart")
     @GET
-    public Response getMedicine(@HeaderParam("searchQuery") String searchQuery)
+    public Response getDataFromCart(@HeaderParam("userId") String userId,@HeaderParam("orderId") String orderId)
     {
         try
         {
             Gson gson = new Gson();
-            
-            return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(Helper.searchMedicine(searchQuery))).build();
-        } catch (Exception ex)
+            return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(Helper.getItemsFromCart(userId, orderId))).build();
+        } 
+        catch (Exception ex)
         {
-            System.out.println("exception in getMedicine :" + ex.toString());
+            System.out.println("exception in getMedicinesForCart :" + ex.toString());
+        }
+        return null;
+    }
+
+    @Path("/addInCart")
+    @GET
+    public Response addInCart(@HeaderParam("medicineId") String medId,@HeaderParam("selectedQty") int selectedQty,@HeaderParam("orderId") String orderId,@HeaderParam("userId") String userId)
+    {
+        try
+        {
+            Gson gson = new Gson();
+            return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(Helper.addToCart(medId, selectedQty, orderId, userId))).build();
+        } 
+        catch (Exception ex)
+        {
+            System.out.println("exception in getMedicinesForCart :" + ex.toString());
         }
         return null;
     }
