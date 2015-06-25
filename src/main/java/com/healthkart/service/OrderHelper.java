@@ -26,7 +26,7 @@ import java.util.logging.Logger;
  *
  * @author RQV035
  */
-public class Helper
+public class OrderHelper
 {
     static String dbUrl = "jdbc:mysql://localhost/inviks";
     static String userName = "root", password = "password";

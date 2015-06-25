@@ -43,7 +43,7 @@ public class HealthkartOrderService
         try
         {
             Gson gson = new Gson();
-            return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(Helper.getOrder())).build();
+            return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(OrderHelper.getOrder())).build();
         } catch (Exception ex)
         {
             System.out.println("exception in createorder :" + ex.toString());
@@ -58,7 +58,7 @@ public class HealthkartOrderService
         try
         {
             Gson gson = new Gson();           
-            return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(Helper.searchMedicine(searchQuery))).build();
+            return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(OrderHelper.searchMedicine(searchQuery))).build();
         } catch (Exception ex)
         {
             System.out.println("exception in searchMedicine :" + ex.toString());
@@ -72,11 +72,11 @@ public class HealthkartOrderService
         try
         {
             Gson gson = new Gson();
-            Medicines med1=Helper.getMedicineDetail(medicineId);
+            Medicines med1=OrderHelper.getMedicineDetail(medicineId);
             ArrayList<Medicines> list=new ArrayList<Medicines>();
             list.add(med1);
             
-            return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(Helper.getSubstitute(medicineId,list))).build();
+            return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(OrderHelper.getSubstitute(medicineId,list))).build();
         } catch (Exception ex)
         {
             System.out.println("exception in getMedicineDetails :" + ex.toString());
@@ -90,7 +90,7 @@ public class HealthkartOrderService
         try
         {
             Gson gson = new Gson();
-            return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(Helper.getItemsFromCart(userId, orderId))).build();
+            return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(OrderHelper.getItemsFromCart(userId, orderId))).build();
         } 
         catch (Exception ex)
         {
@@ -106,7 +106,7 @@ public class HealthkartOrderService
         try
         {
             Gson gson = new Gson();
-            return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(Helper.addToCart(medId, selectedQty, orderId, userId))).build();
+            return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(OrderHelper.addToCart(medId, selectedQty, orderId, userId))).build();
         } 
         catch (Exception ex)
         {
@@ -122,7 +122,7 @@ public class HealthkartOrderService
         //return null;
         try
         {
-            if (Helper.isValidPincode(pincode))
+            if (OrderHelper.isValidPincode(pincode))
             {
                 return Response.status(HttpServletResponse.SC_OK).build();
             } 
