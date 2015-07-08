@@ -30,7 +30,10 @@ public class UserHelper
     static String userName = "root", password = "password";
     static String forname = "com.mysql.jdbc.Driver";
     static Connection con;
-
+    public static void updateUserCode(String userid,String code)
+    {
+        
+    }
     public static String checkUserNamePwd(String userid, String pwd)
     {   
         String returnStatus = "";
@@ -73,7 +76,7 @@ public class UserHelper
         } 
         catch (Exception e)
         {
-            System.out.println("exception in checkUserNamePwd :" + e.toString());            
+            System.out.println("exception in verifyUser :" + e.toString());            
         }
         return returnStatus;
     }
@@ -101,7 +104,7 @@ public class UserHelper
         return returnStatus;
     }
     
-    public static String forgotPassword(String userid)
+    public static String forgotPassword(String userid,String code)
     {   
         String returnStatus = null;
         try
@@ -111,7 +114,7 @@ public class UserHelper
             CallableStatement cs = null;
             cs = con.prepareCall("{call forgotPassword(?,?,?)}");
             cs.setString(1, userid);
-            cs.setString(2, String.valueOf(generateRandom(1000,9999)));            
+            cs.setString(2, code);            
             cs.registerOutParameter(3, Types.VARCHAR);
             cs.executeQuery();
             returnStatus = cs.getString(3);            
@@ -133,7 +136,7 @@ public class UserHelper
         }
         return randomInt;
     }
-    static boolean addNewUser(String name, String userId, String pwd) throws Exception
+    static boolean addNewUser(String name, String userId, String pwd,String randomInt) throws Exception
     {
         Boolean returnStatus = false;
         Class.forName(forname);
@@ -142,16 +145,14 @@ public class UserHelper
         cs = con.prepareCall("{call createNewUser(?,?,?,?,?)}");
         cs.setString(1, name);
         cs.setString(2, userId);
-        cs.setString(3, pwd);
-        int randomInt=generateRandom(1000,9999);
-        cs.setString(4, String.valueOf(randomInt));
+        cs.setString(3, pwd);        
+        cs.setString(4, randomInt);
         cs.registerOutParameter(5, Types.BOOLEAN);
         cs.executeQuery();
         returnStatus = cs.getBoolean(5);
         con.close();
-        String subject = "Inviks app:activate your account";
-        String body = "Hi,\nYour activation code for Inviks app is:\n" + randomInt + "\n\nEnter this in your app and your account will be activated.\nThanks,\nTeam Inviks";
-        sendEmail(userId, subject, body);
+        
+        //sendEmail(userId, subject, body);
         return returnStatus;
     }
 

@@ -29,13 +29,13 @@ import com.sun.org.apache.xerces.internal.util.Status;
  */
 @Path("/users")
 public class HealthkartUserService {
-
+    
     @Path("/forgotPassword")	
     @GET
-    public Response forgotPassword( @HeaderParam("userId") String userId )
+    public Response forgotPassword( @HeaderParam("userId") String userId,@HeaderParam("code") String code )
     {
         Gson gson = new Gson();
-        return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(UserHelper.forgotPassword(userId))).build();
+        return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(UserHelper.forgotPassword(userId,code))).build();
     }
     @Path("/checkForgotCode")	
     @GET
@@ -60,11 +60,11 @@ public class HealthkartUserService {
     }
     @Path("/registerUser")	
     @GET
-    public Response registerUser( @HeaderParam("name") String name,@HeaderParam("userId") String userId,@HeaderParam("pwd") String pwd )
+    public Response registerUser( @HeaderParam("name") String name,@HeaderParam("userId") String userId,@HeaderParam("pwd") String pwd,@HeaderParam("code") String code  )
     {
         try
         {            
-            if(UserHelper.addNewUser(name,userId, pwd))
+            if(UserHelper.addNewUser(name,userId, pwd,code))
             {                
                 return Response.status(HttpServletResponse.SC_OK).build();                
             }
