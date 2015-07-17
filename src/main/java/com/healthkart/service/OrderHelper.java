@@ -133,32 +133,7 @@ public class OrderHelper
         }
         return arr;
     }
-    static ArrayList<Demo> getOrder()
-    {
-
-        String query = "Select * FROM demo";
-
-        ArrayList<Demo> arr = new ArrayList<Demo>();
-        try
-        {
-
-            Class.forName(forname);
-            Connection con = DriverManager.getConnection(dbUrl, userName, password);
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
-
-            while (rs.next())
-            {
-                arr.add(new Demo(rs.getString(1)));
-            }
-            System.out.println(arr);
-            con.close();
-        } catch (Exception e)
-        {
-            System.out.println("exception in getorder :" + e.toString());
-        }
-        return arr;
-    }
+    
     static ArrayList<Medicines> searchMedicine(String searchString)
     {
         //connection.prepareStatement("SELECT * FROM table1 LIMIT ?,?");
@@ -305,9 +280,36 @@ public class OrderHelper
         } 
         catch (Exception e)
         {
-            System.out.println("exception in addToCart :" + e.toString());            
+            System.out.println("exception in getItemsFromCart :" + e.toString());            
         }
         return arrayList;
     }
-    
+    static Boolean isDeletedFromCart(String orderId,String medId)
+    {
+        if(orderId==null || medId==null)
+            return false;
+        if(orderId.isEmpty() || medId.isEmpty())
+        {
+            return false;
+        }        
+        try
+        {
+            Class.forName(forname);
+            con = DriverManager.getConnection(dbUrl, userName, password);
+            CallableStatement cs = null;            
+            cs = con.prepareCall("{call deleteFromCart(?,?,?)}");
+            cs.setString(1, orderId);
+            cs.setString(2, medId);
+            cs.registerOutParameter(3, Types.BOOLEAN);
+            ResultSet rs = cs.executeQuery();
+            boolean returnStatus=cs.getBoolean(3);            
+            con.close();            
+            return returnStatus;
+        } 
+        catch (Exception e)
+        {
+            System.out.println("exception in isDeletedFromCart :" + e.toString());
+        }
+        return false;
+    }
 }

@@ -33,24 +33,6 @@ import javax.ws.rs.HeaderParam;
 @Path("/orders")
 public class HealthkartOrderService
 {  
-    @Path("/createOrder")
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response createOrder(InputStream is)
-    {
-        //return null;
-        try
-        {
-            Gson gson = new Gson();
-            return Response.status(HttpServletResponse.SC_OK).entity(gson.toJson(OrderHelper.getOrder())).build();
-        } catch (Exception ex)
-        {
-            System.out.println("exception in createorder :" + ex.toString());
-        }
-        return null;
-    }
-
     @Path("/searchMedicine")
     @GET
     public Response searchMedicine(@HeaderParam("searchQuery") String searchQuery)
@@ -137,15 +119,25 @@ public class HealthkartOrderService
         }
         return null;
     }
-
-}
-class Demo
-{
-
-    String value;
-
-    public Demo(String val)
-    {
-        value = val;
+    @Path("/deleteItemFromCart")
+    @GET
+    public Response deleteItemFromCart(@HeaderParam("orderId") String orderId,@HeaderParam("medicineId") String medicineId)
+    {        
+        try
+        {
+            if (OrderHelper.isDeletedFromCart(orderId, medicineId))
+            {
+                return Response.status(HttpServletResponse.SC_OK).build();
+            } 
+            else
+            {
+                return Response.status(HttpServletResponse.SC_BAD_REQUEST).build();
+            }
+        } 
+        catch (Exception ex)
+        {
+            System.out.println("exception in deleteItemFromCart :" + ex.toString());
+        }
+        return null;
     }
 }
